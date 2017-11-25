@@ -74,9 +74,9 @@ public class TypeCheckVisitor implements ASTVisitor {
 			throw new SemanticException(declaration_Variable.firstToken, message);
 		}
 		symTab.insertNode(declaration_Variable.name, declaration_Variable);
-		declaration_Variable.nodeType = TypeUtils.getType(declaration_Variable.type);
+		declaration_Variable.setNodeType(TypeUtils.getType(declaration_Variable.type));
 		if (declaration_Variable.e != null) {
-			if (declaration_Variable.nodeType != declaration_Variable.e.getNodeType()) {
+			if (declaration_Variable.getNodeType() != declaration_Variable.e.getNodeType()) {
 				String message = "Visit Declaration Variable";
 				throw new SemanticException(declaration_Variable.firstToken, message);
 			}
@@ -163,10 +163,10 @@ public class TypeCheckVisitor implements ASTVisitor {
 			expression_PixelSelector.index.visit(this, null);
 		}
 		Declaration tempDec = symTab.getNode(expression_PixelSelector.name);
-		if (tempDec.nodeType == Type.IMAGE) {
+		if (tempDec.getNodeType() == Type.IMAGE) {
 			expression_PixelSelector.setNodeType(Type.INTEGER);
 		} else if (expression_PixelSelector.index == null) {
-			expression_PixelSelector.setNodeType(tempDec.nodeType);
+			expression_PixelSelector.setNodeType(tempDec.getNodeType());
 		} else {
 			expression_PixelSelector.setNodeType(null);
 		}
@@ -215,7 +215,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 			throw new SemanticException(declaration_Image.firstToken, message);
 		}
 		symTab.insertNode(declaration_Image.name, declaration_Image);
-		declaration_Image.nodeType = Type.IMAGE;
+		declaration_Image.setNodeType(Type.IMAGE);
 
 		if (declaration_Image.xSize != null) {
 			if (!(declaration_Image.ySize != null && declaration_Image.xSize.getNodeType() == Type.INTEGER
@@ -260,7 +260,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 			String message = "Visit Source Identifier";
 			throw new SemanticException(source_Ident.firstToken, message);
 		}
-		source_Ident.nodeType = symTab.getNode(source_Ident.name).nodeType;
+		source_Ident.nodeType = symTab.getNode(source_Ident.name).getNodeType();
 		if (!(source_Ident.nodeType == Type.FILE || source_Ident.nodeType == Type.URL)) {
 			String message = "Source Ident Type in Visit Source Identifier is not a File or URL";
 			throw new SemanticException(source_Ident.firstToken, message);
@@ -281,15 +281,15 @@ public class TypeCheckVisitor implements ASTVisitor {
 		symTab.insertNode(declaration_SourceSink.name, declaration_SourceSink);
 		switch (declaration_SourceSink.type) {
 		case KW_file:
-			declaration_SourceSink.nodeType = Type.FILE;
+			declaration_SourceSink.setNodeType(Type.FILE);
 			break;
 		case KW_url:
-			declaration_SourceSink.nodeType = Type.URL;
+			declaration_SourceSink.setNodeType(Type.URL);
 			break;
 		default:
 			throw new SemanticException(declaration_SourceSink.firstToken, message);
 		}
-		if (declaration_SourceSink.nodeType != declaration_SourceSink.source.nodeType) {
+		if (declaration_SourceSink.getNodeType() != declaration_SourceSink.source.nodeType) {
 			throw new SemanticException(declaration_SourceSink.firstToken, message);
 		}
 		return declaration_SourceSink;
@@ -344,9 +344,9 @@ public class TypeCheckVisitor implements ASTVisitor {
 		}
 		Declaration name = symTab.getNode(statement_Out.name);
 
-		if (((name.nodeType == Type.INTEGER || name.nodeType == Type.BOOLEAN)
+		if (((name.getNodeType() == Type.INTEGER || name.getNodeType() == Type.BOOLEAN)
 				&& statement_Out.sink.nodeType == Type.SCREEN)
-				|| (name.nodeType == Type.IMAGE
+				|| (name.getNodeType() == Type.IMAGE
 						&& (statement_Out.sink.nodeType == Type.FILE || statement_Out.sink.nodeType == Type.SCREEN))) {
 			statement_Out.setDec(name);
 		} else {
@@ -362,7 +362,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 			statement_In.source.visit(this, null);
 		}
 		Declaration name = symTab.getNode(statement_In.name);
-		if (name != null && name.nodeType == statement_In.source.nodeType) {
+		if (name != null && name.getNodeType() == statement_In.source.nodeType) {
 			statement_In.setDec(name);
 		} else {
 			throw new SemanticException(statement_In.firstToken, message);
@@ -397,7 +397,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 			throw new SemanticException(lhs.firstToken, message);
 		}
 		lhs.declaration = symTab.getNode(lhs.name);
-		lhs.nodeType = lhs.declaration.nodeType;
+		lhs.nodeType = lhs.declaration.getNodeType();
 		lhs.isCartesian = lhs.index != null ? lhs.index.isCartesian() : false;
 		return lhs;
 	}
@@ -414,7 +414,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 			String message = "Visit Sink Ident not found in Symbol Table";
 			throw new SemanticException(sink_Ident.firstToken, message);
 		}
-		sink_Ident.nodeType = symTab.getNode(sink_Ident.name).nodeType;
+		sink_Ident.nodeType = symTab.getNode(sink_Ident.name).getNodeType();
 		if (sink_Ident.nodeType == Type.FILE) {
 			// Do Nothing
 		} else {
@@ -434,7 +434,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 	public Object visitExpression_Ident(Expression_Ident expression_Ident, Object arg) throws Exception {
 		String message = "Visit Expression Identifier";
 		if (symTab.lookupNode(expression_Ident.name)) {
-			expression_Ident.setNodeType(symTab.getNode(expression_Ident.name).nodeType);
+			expression_Ident.setNodeType(symTab.getNode(expression_Ident.name).getNodeType());
 		} else {
 			throw new SemanticException(expression_Ident.firstToken, message);
 		}

@@ -8,6 +8,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import cop5556fa17.Scanner.Kind;
+import cop5556fa17.TypeUtils.Type;
 import cop5556fa17.AST.ASTNode;
 import cop5556fa17.AST.ASTVisitor;
 import cop5556fa17.AST.Declaration_Image;
@@ -222,10 +223,35 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitExpression_Unary(Expression_Unary expression_Unary, Object arg) throws Exception {
-		// TODO
-		throw new UnsupportedOperationException();
-		// CodeGenUtils.genLogTOS(GRADE, mv, expression_Unary.getType());
-		// return null;
+		if (expression_Unary.e != null) {
+			expression_Unary.e.visit(this, arg);
+		}
+		Kind exprUnaryOp = expression_Unary.op;
+		Type exprUnaryType = expression_Unary.e.getNodeType();
+		switch (exprUnaryOp) {
+		case OP_PLUS:
+			break;
+		case OP_MINUS:
+			mv.visitInsn(INEG);
+			break;
+		case OP_EXCL:
+			switch (exprUnaryType) {
+			case BOOLEAN:
+				mv.visitInsn(ICONST_1);
+				mv.visitInsn(IXOR);
+				break;
+			case INTEGER:
+				mv.visitLdcInsn(Integer.valueOf(Integer.MAX_VALUE));
+				mv.visitInsn(IXOR);
+				break;
+			default:
+				throw new UnsupportedOperationException();
+			}
+		default:
+			throw new UnsupportedOperationException();
+		}
+		CodeGenUtils.genLogTOS(GRADE, mv, expression_Unary.getNodeType());
+		return null;
 	}
 
 	// generate code to leave the two values on the stack
