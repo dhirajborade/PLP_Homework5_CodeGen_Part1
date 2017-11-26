@@ -271,11 +271,20 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	@Override
 	public Object visitExpression_Conditional(Expression_Conditional expression_Conditional, Object arg)
 			throws Exception {
-		// TODO
-		throw new UnsupportedOperationException();
-		// CodeGenUtils.genLogTOS(GRADE, mv,
-		// expression_Conditional.trueExpression.getType());
-		// return null;
+		// TODO Check Once before Submission
+		if (expression_Conditional.condition != null) {
+			expression_Conditional.condition.visit(this, arg);
+		}
+		Label argOne = new Label();
+		Label argTwo = new Label();
+		mv.visitJumpInsn(IFNE, argOne);
+		expression_Conditional.falseExpression.visit(this, arg);
+		mv.visitJumpInsn(GOTO, argTwo);
+		mv.visitLabel(argOne);
+		expression_Conditional.trueExpression.visit(this, arg);
+		mv.visitLabel(argTwo);
+		CodeGenUtils.genLogTOS(GRADE, mv, expression_Conditional.trueExpression.getNodeType());
+		return null;
 	}
 
 	@Override
@@ -293,8 +302,10 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	@Override
 	public Object visitSource_CommandLineParam(Source_CommandLineParam source_CommandLineParam, Object arg)
 			throws Exception {
-		// TODO
-		throw new UnsupportedOperationException();
+		mv.visitVarInsn(ALOAD, 0);
+		source_CommandLineParam.paramNum.visit(this, arg);
+		mv.visitInsn(AALOAD);
+		return null;
 	}
 
 	@Override
@@ -312,10 +323,10 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitExpression_IntLit(Expression_IntLit expression_IntLit, Object arg) throws Exception {
-		// TODO
-		throw new UnsupportedOperationException();
-		// CodeGenUtils.genLogTOS(GRADE, mv, Type.INTEGER);
-		// return null;
+		Integer obj = Integer.valueOf(expression_IntLit.value);
+		mv.visitLdcInsn(obj);
+		CodeGenUtils.genLogTOS(GRADE, mv, Type.INTEGER);
+		return null;
 	}
 
 	@Override
@@ -348,7 +359,29 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	public Object visitStatement_Out(Statement_Out statement_Out, Object arg) throws Exception {
 		// TODO in HW5: only INTEGER and BOOLEAN
 		// TODO HW6 remaining cases
-		throw new UnsupportedOperationException();
+
+		String argOne;
+		String argTwo;
+		mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+
+		Type statementOutType = statement_Out.getDec().getNodeType();
+		switch (statementOutType) {
+		case INTEGER:
+			argOne = "I";
+			argTwo = "(I)V";
+			break;
+		case BOOLEAN:
+			argOne = "Z";
+			argTwo = "(Z)V";
+			break;
+		default:
+			throw new UnsupportedOperationException();
+		}
+
+		mv.visitFieldInsn(GETSTATIC, className, statement_Out.name, argOne);
+		CodeGenUtils.genLogTOS(GRADE, mv, statement_Out.getDec().getNodeType());
+		mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "print", argTwo, false);
+		return null;
 	}
 
 	/**
@@ -362,27 +395,68 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	 */
 	@Override
 	public Object visitStatement_In(Statement_In statement_In, Object arg) throws Exception {
-		// TODO (see comment )
-		throw new UnsupportedOperationException();
+
+		if (statement_In.source != null) {
+			statement_In.source.visit(this, arg);
+		}
+		String argOne;
+		String argTwo;
+		String argThree;
+		String argFour;
+		Type statementInType = statement_In.getDec().getNodeType();
+		switch (statementInType) {
+		case INTEGER:
+			argOne = "java/lang/Integer";
+			argTwo = "parseInt";
+			argThree = "(Ljava/lang/String;)I";
+			argFour = "I";
+			break;
+		case BOOLEAN:
+			argOne = "java/lang/Boolean";
+			argTwo = "parseBoolean";
+			argThree = "(Ljava/lang/String;)Z";
+			argFour = "Z";
+			break;
+		default:
+			throw new UnsupportedOperationException();
+		}
+		mv.visitMethodInsn(INVOKESTATIC, argOne, argTwo, argThree, false);
+		mv.visitFieldInsn(PUTSTATIC, className, statement_In.name, argFour);
+		return null;
 	}
 
 	/**
 	 * In HW5, only handle INTEGER and BOOLEAN types.
 	 */
 
-	/*
-	 * @Override public Object visitStatement_Transform(Statement_Assign
-	 * statement_Assign, Object arg) throws Exception { //TODO (see comment) throw
-	 * new UnsupportedOperationException(); }
-	 */
+	// @Override
+	public Object visitStatement_Transform(Statement_Assign statement_Assign, Object arg) throws Exception {
+		// TODO (see comment)
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * In HW5, only handle INTEGER and BOOLEAN types.
 	 */
 	@Override
 	public Object visitLHS(LHS lhs, Object arg) throws Exception {
-		// TODO (see comment)
-		throw new UnsupportedOperationException();
+		if (lhs.index != null) {
+			lhs.index.visit(this, arg);
+		}
+		String type;
+		Type lhsType = lhs.getNodeType();
+		switch (lhsType) {
+		case INTEGER:
+			type = "I";
+			break;
+		case BOOLEAN:
+			type = "Z";
+			break;
+		default:
+			throw new UnsupportedOperationException();
+		}
+		mv.visitFieldInsn(PUTSTATIC, className, lhs.name, type);
+		return null;
 	}
 
 	@Override

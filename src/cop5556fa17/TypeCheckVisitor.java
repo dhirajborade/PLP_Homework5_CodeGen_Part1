@@ -378,7 +378,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 		if (statement_Assign.e != null) {
 			statement_Assign.e.visit(this, null);
 		}
-		if (statement_Assign.lhs.nodeType == statement_Assign.e.getNodeType()) {
+		if (statement_Assign.lhs.getNodeType() == statement_Assign.e.getNodeType()) {
 			statement_Assign.setCartesian(statement_Assign.lhs.isCartesian);
 		} else {
 			String message = "Visit Statement Assignment";
@@ -397,7 +397,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 			throw new SemanticException(lhs.firstToken, message);
 		}
 		lhs.declaration = symTab.getNode(lhs.name);
-		lhs.nodeType = lhs.declaration.getNodeType();
+		lhs.setNodeType(lhs.declaration.getNodeType());
 		lhs.isCartesian = lhs.index != null ? lhs.index.isCartesian() : false;
 		return lhs;
 	}
