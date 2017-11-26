@@ -473,18 +473,29 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitExpression_BooleanLit(Expression_BooleanLit expression_BooleanLit, Object arg) throws Exception {
-		// TODO
-		throw new UnsupportedOperationException();
-		// CodeGenUtils.genLogTOS(GRADE, mv, Type.BOOLEAN);
-		// return null;
+		Boolean booleanObject = Boolean.valueOf(expression_BooleanLit.value);
+		mv.visitLdcInsn(booleanObject);
+		CodeGenUtils.genLogTOS(GRADE, mv, Type.BOOLEAN);
+		return null;
 	}
 
 	@Override
 	public Object visitExpression_Ident(Expression_Ident expression_Ident, Object arg) throws Exception {
-		// TODO
-		throw new UnsupportedOperationException();
-		// CodeGenUtils.genLogTOS(GRADE, mv, expression_Ident.getType());
-		// return null;
+		String type;
+		Type exprIdent = expression_Ident.getNodeType();
+		switch (exprIdent) {
+		case INTEGER:
+			type = "I";
+			break;
+		case BOOLEAN:
+			type = "B";
+			break;
+		default:
+			throw new UnsupportedOperationException();
+		}
+		mv.visitFieldInsn(GETSTATIC, className, expression_Ident.name, type);
+		CodeGenUtils.genLogTOS(GRADE, mv, expression_Ident.getNodeType());
+		return null;
 	}
 
 	@Override
