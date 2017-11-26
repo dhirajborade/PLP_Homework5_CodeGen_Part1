@@ -358,11 +358,9 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitStatement_In(Statement_In statement_In, Object arg) throws Exception {
 		String message = "Visit Statement In";
-		if (statement_In.source != null) {
+		if (symTab.lookupNode(statement_In.name)) {
 			statement_In.source.visit(this, null);
-		}
-		Declaration name = symTab.getNode(statement_In.name);
-		if (name != null && name.getNodeType() == statement_In.source.nodeType) {
+			Declaration name = symTab.getNode(statement_In.name);
 			statement_In.setDec(name);
 		} else {
 			throw new SemanticException(statement_In.firstToken, message);

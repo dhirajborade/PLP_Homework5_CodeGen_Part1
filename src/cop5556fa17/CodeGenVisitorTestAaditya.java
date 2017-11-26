@@ -10,8 +10,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import cop5556fa17.AST.Program;
 import cop5556fa17.CodeGenUtils.DynamicClassLoader;
+import cop5556fa17.AST.Program;
 
 public class CodeGenVisitorTestAaditya {
 
@@ -115,22 +115,6 @@ public class CodeGenVisitorTestAaditya {
 	}
 
 	@Test
-	public void checkAdd() throws Exception {
-		String prog = "addition";
-		String input = prog + "\nint abc;\nabc = 9;\n" + "\nint bcd;\nbcd = 4;\n" + "\nint g = abc * bcd;"
-				+ "g -> SCREEN;";
-		show(input);
-		byte[] bytecode = genCode(input);
-		String[] commandLineArgs = {};
-		runCode(prog, bytecode, commandLineArgs);
-		show("Log:\n" + RuntimeLog.globalLog);
-		// assertEquals("entering main;false;false;false;true;true;leaving
-		// main;",RuntimeLog.globalLog.toString());
-		System.out.println(RuntimeLog.globalLog.toString());
-
-	}
-
-	@Test
 	public void prog2() throws Exception {
 		String prog = "prog2";
 		String input = prog + "\nboolean g;\ng = true;\ng -> SCREEN;\ng = false;\ng -> SCREEN;";
@@ -140,19 +124,6 @@ public class CodeGenVisitorTestAaditya {
 		runCode(prog, bytecode, commandLineArgs);
 		show("Log:\n" + RuntimeLog.globalLog);
 		assertEquals("entering main;true;true;false;false;leaving main;", RuntimeLog.globalLog.toString());
-	}
-
-	@Test
-	public void prog16() throws Exception {
-		// scan, parse, and type check the program
-		String prog = "prog16";
-		String input = prog + "\nint j;int k;\nj <- @ 0;\nk <- @ 1;\nint output = j * -k/j;\noutput -> SCREEN;";
-		show(input);
-		byte[] bytecode = genCode(input);
-		String[] commandLineArgs = { "123", "456" }; // create command line argument array to initialize params, none in
-														// this case
-		runCode(prog, bytecode, commandLineArgs);
-		show("Log:\n" + RuntimeLog.globalLog);
 	}
 
 	@Test
@@ -196,6 +167,33 @@ public class CodeGenVisitorTestAaditya {
 		show("Log:\n" + RuntimeLog.globalLog);
 		assertEquals("entering main;false;false;false;true;true;leaving main;", RuntimeLog.globalLog.toString());
 
+	}
+
+	@Test
+	public void prog16() throws Exception {
+		// scan, parse, and type check the program
+		String prog = "prog16";
+		String input = prog + "\nint j;int k;\nj <- @ 0;\nk <- @ 1;\nint output = j * -k/j;\noutput -> SCREEN;";
+		show(input);
+		byte[] bytecode = genCode(input);
+		String[] commandLineArgs = { "123", "456" }; // create command line argument array to initialize params, none in
+														// this case
+		runCode(prog, bytecode, commandLineArgs);
+		show("Log:\n" + RuntimeLog.globalLog);
+	}
+
+	@Test
+	public void prog7() throws Exception {
+		// scan, parse, and type check the program
+		String prog = "prog7";
+		String input = prog
+				+ "\nint var1;\nvar1 <- @ 0;\nint var2;\nvar2 <- @ 1;\nint output = var1  % var2 + var2;\noutput -> SCREEN;int output2 = var1 - 10 * var2;\noutput2 -> SCREEN;";
+		show(input);
+		byte[] bytecode = genCode(input);
+		String[] commandLineArgs = { "20", "8" }; // create command line argument array to initialize params, none in
+													// this case
+		runCode(prog, bytecode, commandLineArgs);
+		show("Log:\n" + RuntimeLog.globalLog);
 	}
 
 }
